@@ -1,17 +1,39 @@
-$filePath = "C:\Users\wvannuffele4\Documents\VO\cwm100285_17 - Copy.txt"
+$rootDirectory = "C:\Users\wvannuffele4\Documents\VO\DMOW\backuplogs\original"
 
-$files = @()
+$filePaths = Get-ChildItem -Path $rootDirectory
 
-ForEach ($line in [System.IO.File]::ReadLines($filePath)) {
-    $pattern = [regex]::new("\/.*\/\S*\.\w*(?!.*\/)")
+ForEach($filePath in $filePaths){
     
-    $matches = $pattern.Matches($line)
-    If($matches.value.Length -gt 0){
-        $pathName = $matches.value
-        $convertedPathName = "G:\" + (($pathName.Substring(3,$pathname.Length-3)) -Replace "\/","\")
-        $longPathName = "\\?\" + $convertedPathName
-        
-        write-host $longPathName
-        $files += $longPathName
+    $files = @()
+    $backupDate = $filePath.Name.Split('_')[1]
+    $backupDate = $backupDate.Substring(0,$backupDate.Length-4)
+
+    ForEach($line in [System.IO.File]::ReadLines($filePath.FullName)){
+        $volumePattern = [Regex]::New('\/G\/1M2B\/')
+
+        If($line -match $volumePattern){
+            $pathPattern = [regex]::new("\/.*\/\S*\.\w*(?!.*\/)")
+            $userNamePattern = [Regex]::New('root;.*@ALFA')
+
+    
+            $matches = $pathPattern.Matches($line)
+            If($matches.value.Length -gt 0){
+                $userNameMatches = $userNamePattern.Matches($line)
+                $userName = $userNameMatches.ToString()
+
+                $pathName = $matches.value
+                $convertedPathName = "G:\" + (($pathName.Substring(3,$pathname.Length-3)) -Replace "\/","\")
+                $longPathName = "\\?\" + $convertedPathName
+
+                $lineObj = [PSCustomObject]@{
+                    'backupDate'    = $backupDate
+                    'fullpath'      = $longPathName
+                    'userName'      = $userName
+                }
+                $lineObj
+                $files += $lineObj
+            }
+        }
     }
+    $files | Select-Object backupDate,fullPath,userName | Export-Csv -Path "C:\users\wvannuffele4\documents\VO\DMOW\incrementalBackupFiles.csv" -NoTypeInformation -Append
 }
