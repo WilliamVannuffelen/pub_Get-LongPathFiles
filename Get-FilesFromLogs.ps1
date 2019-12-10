@@ -1,4 +1,4 @@
-$rootDirectory = "C:\Users\wvannuffele4\Documents\VO\DMOW\backuplogs\original"
+$rootDirectory = "C:\dir\dir"
 
 $filePaths = Get-ChildItem -Path $rootDirectory
 
@@ -35,5 +35,5 @@ ForEach($filePath in $filePaths){
             }
         }
     }
-    $files | Select-Object backupDate,fullPath,userName | Export-Csv -Path "C:\users\wvannuffele4\documents\VO\DMOW\incrementalBackupFiles.csv" -NoTypeInformation -Append
+    $files | Select-Object backupDate,fullPath,userName | Export-Csv -Path "C:\dir\dir\file.csv" -NoTypeInformation -Append
 }
