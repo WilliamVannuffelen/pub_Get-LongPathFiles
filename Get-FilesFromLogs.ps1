@@ -13,7 +13,7 @@ ForEach($filePath in $filePaths){
 
         If($line -match $volumePattern){
             $pathPattern = [regex]::new("\/.*\/\S*\.\w*(?!.*\/)")
-            $userNamePattern = [Regex]::New('root;.*@ALFA')
+            $userNamePattern = [Regex]::New('root;.*@')
 
     
             $matches = $pathPattern.Matches($line)
