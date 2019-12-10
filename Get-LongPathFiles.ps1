@@ -64,7 +64,7 @@ $type = Add-Type -MemberDefinition $signature -Name ‘Kernel32’ -Namespace �
 $infoLevelsEnum = New-Object Win32.Kernel32+GET_FILEEX_INFO_LEVELS
 $fileAttribData = New-Object Win32.Kernel32+WIN32_FILE_ATTRIBUTE_DATA
 
-$testFiles = Import-Csv "C:\Users\wvannuffele4\Documents\VO\DMOW\incrementalBackupFilesFormatted.csv"
+$testFiles = Import-Csv "C:\dir\dir\incrementalBackupFilesFormatted.csv"
 
 $fileObjects = @()
 
