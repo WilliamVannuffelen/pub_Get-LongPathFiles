@@ -1,14 +1,16 @@
 function Get-LongPathFile($file){
-    $result = $type[0]::GetFileAttributesEx($file, $infoLevelsEnum, [ref]$fileAttribData)
+    $result = $type[0]::GetFileAttributesEx($file.fullPath, $infoLevelsEnum, [ref]$fileAttribData)
 
     If(!$result){
         $fileObject = [PSCustomObject]@{
-            'fullPath'          = $file
+            'backupDate'        = $file.backupDate
+            'fullPath'          = $file.fullPath
             'presentInTarget'   = "No"
             'fileSizeNum'       = 0
             'fileSizeStr'       = "0"
             'creationTime'      = 0
             'lastWriteTime'     = 0
+            'userName'          = "/"
         }
     }
     ElseIf($result){
@@ -20,12 +22,14 @@ function Get-LongPathFile($file){
         }
 
         $fileObject = [PSCustomObject]@{
-            'fullPath'          = $file
+            'backupDate'        = $file.backupDate
+            'fullPath'          = $file.fullPath
             'presentInTarget'   = "Yes"
             'fileSizeNum'       = $roundedFileSize
             'fileSizeStr'       = $roundedFileSize.ToString('N0')
             'creationTime'      = ([DateTime]::FromFileTime($fileAttribData.ftCreationTime.dwLowDateTime + ([Math]::Pow(2,32) * $fileAttribData.ftCreationTime.dwHighDateTime))).ToString()
             'lastWriteTime'     = ([DateTime]::FromFileTime($fileAttribData.ftLastWriteTime.dwLowDateTime + ([Math]::Pow(2,32) * $fileAttribData.ftLastWriteTime.dwHighDateTime))).ToString()
+            'userName'          = $file.userName
         }
     }
     return $fileObject
@@ -60,11 +64,7 @@ $type = Add-Type -MemberDefinition $signature -Name ‘Kernel32’ -Namespace �
 $infoLevelsEnum = New-Object Win32.Kernel32+GET_FILEEX_INFO_LEVELS
 $fileAttribData = New-Object Win32.Kernel32+WIN32_FILE_ATTRIBUTE_DATA
 
-$testFile = "\\?\C:\temp\destiny2_solo.ps1"
-$testFile2 = "\\?\c:\temp\wvdtvm05.893ebb3d-532a-4148-ba83-eab42c44b275.screenshot.bmp"
-$testFile3 = "\\?\C:\temp\testfile_doesntexist.txt"
-$testFile4 = "\\?\C:\temp\New Text Document.txt"
-$testFiles = $testFile,$testFile2,$testFile3,$testFile4
+$testFiles = Import-Csv "C:\Users\wvannuffele4\Documents\VO\DMOW\incrementalBackupFilesFormatted.csv"
 
 $fileObjects = @()
 
@@ -72,3 +72,5 @@ ForEach($testFile in $testFiles){
     $fileObject = Get-LongPathFile $testFile
     $fileObjects += $fileObject
 }
+
+$fileObjects | Select-Object backupDate, fullPath, presentInTarget, fileSizeNum, fileSizeStr, creationTime, lastWriteTime, userName | Export-Csv "C:\temp\dmow_incremental_check.csv" -NoTypeInformation -Encoding UTF8
