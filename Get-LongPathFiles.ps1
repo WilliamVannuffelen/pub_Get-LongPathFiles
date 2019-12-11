@@ -73,4 +73,4 @@ ForEach($testFile in $testFiles){
     $fileObjects += $fileObject
 }
 
-$fileObjects | Select-Object backupDate, fullPath, presentInTarget, fileSizeNum, fileSizeStr, creationTime, lastWriteTime, userName | Export-Csv "C:\temp\dmow_incremental_check.csv" -NoTypeInformation -Encoding UTF8
+$fileObjects | Select-Object backupDate, fullPath, presentInTarget, fileSizeNum, fileSizeStr, creationTime, lastWriteTime, userName | Export-Csv "C:\temp\volume_incremental_check.csv" -NoTypeInformation -Encoding UTF8
